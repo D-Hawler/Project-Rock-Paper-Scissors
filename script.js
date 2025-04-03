@@ -1,8 +1,10 @@
 const container = document.querySelector(".mainContainer");
 const start = document.querySelector("#gameStart");
 
+let rock, paper, scissors, choice, gameFunctional;
+
 start.onclick = () => {
-    const gameFunctional = document.createElement("section");
+    gameFunctional = document.createElement("section");
     gameFunctional.classList.add("gameFunctional");
 
     const gameChoice = document.createElement("section");
@@ -20,23 +22,28 @@ start.onclick = () => {
     gameFunctional.appendChild(cardPlayrs);
     gameFunctional.appendChild(cardComputer);
 
+    const tip = document.createElement("p");
+    tip.innerHTML = "Your side on the left <br>&#11185;";
+    tip.classList.add("tip");
+
+    gameFunctional.appendChild(tip);
+
     const textChoice = document.createElement("h1");
     textChoice.textContent = "Make your choice:";
 
     gameChoice.appendChild(textChoice);
 
-    const choice = document.createElement("div");
+    choice = document.createElement("div");
     choice.classList.add("choice");
-
     gameChoice.appendChild(choice);
 
-    const rock = document.createElement("button");
+    rock = document.createElement("button");
     rock.textContent = "Rock";
 
-    const paper = document.createElement("button");
+    paper = document.createElement("button");
     paper.textContent = "Paper";
 
-    const scissors = document.createElement("button");
+    scissors = document.createElement("button");
     scissors.textContent = "Scissors";
 
     choice.appendChild(rock);
@@ -70,6 +77,13 @@ start.onclick = () => {
     score.appendChild(scoreP);
     score.appendChild(scoreC);
 
+    const tip2 = document.createElement("p");
+    tip2.innerHTML = "The game will be played until<br>one side wins five times <br>&#11185;";
+    tip2.classList.add("tip2");
+
+    scoreGame.appendChild(tip2);
+
+    start.parentNode.removeChild(start);
     start.onclick = null;
 
     rock.onclick = () => playRound("rock");
@@ -82,7 +96,7 @@ function playRound(human) {
     cardChanges(human, computer);
 
     if (human === computer) {
-        console.log(`Draw both chose: ${human}`)
+        return draw();
     }
     
     if (human === "rock" && computer === "scissors") {
@@ -107,22 +121,59 @@ let scoreComputer = 0;
 
 function won() {
     scorePlayrs++;
+    const gameFunctional = document.querySelector(".gameFunctional");
+    gameFunctional.style.background = "linear-gradient(to right, rgba(0, 255, 0, 0.5), rgb(255, 255, 255))";
     const scoreP = document.querySelector("#players");
+    if (getDraw && getDraw.parentNode === gameFunctional) {
+        gameFunctional.removeChild(getDraw);
+    }
     scoreP.textContent = scorePlayrs;
+    score();
 }
 
 function lose() {
     scoreComputer++;
+    const gameFunctional = document.querySelector(".gameFunctional");
+    gameFunctional.style.background = "linear-gradient(to left,rgba(0, 255, 0, 0.5), rgb(255, 255, 255))";
     const scoreC = document.querySelector("#computer");
+    if (getDraw && getDraw.parentNode === gameFunctional) {
+        gameFunctional.removeChild(getDraw);
+    }
     scoreC.textContent = scoreComputer;
+    score();
+}
+
+let getDraw;
+function draw() {
+    if (!getDraw || getDraw.parentNode !== gameFunctional) {
+        getDraw = document.createElement("h1");
+        getDraw.textContent = "Draw";
+        getDraw.classList.add("draw");
+        gameFunctional.style.background = "rgb(255, 255, 255)";
+
+        gameFunctional.appendChild(getDraw);
+    }
 }
 
 function score() {
+    if (scorePlayrs >= 5 || scoreComputer >= 5) {
+        rock.onclick = null;
+        paper.onclick = null;
+        scissors.onclick = null;
 
+        while (choice.firstChild) {
+            choice.removeChild(choice.firstChild);
+        }
+
+        const endMessage = document.createElement("h2");
+        endMessage.textContent = scorePlayrs >= 5 ? "You won that game!! (Press F5 to start the game again)" : "You lost that game!! (Press F5 to start the game again)";
+        endMessage.classList.add(scorePlayrs >= 5 ? "won" : "lose");
+        choice.appendChild(endMessage);
+    }
 }
 
 function getComputerChoice() {
-    let x = parseInt(Math.random() * 3);1
+    let x = parseInt(Math.random() * 3);
 
     switch (x) {
         case 0:
